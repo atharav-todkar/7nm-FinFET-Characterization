@@ -1,0 +1,78 @@
+** sch_path: /home/hprcse/Finfet/nfet_char.sch
+
+* Input and supply
+V1 nfet_in GND 0
+V2 vdd GND 0.7
+
+* Load resistor
+R1 vdd nfet_out 1k
+
+* FinFET device
+Xnfet2 nfet_out nfet_in GND GND asap_7nm_nfet l=7e-9 nfin=14
+
+* DC sweep
+.dc v1 0 0.7 1m v2 0 0.7 0.2
+
+.control
+
+* Load ASAP7 FinFET model (Correct path for Codespaces)
+pre_osdi /workspaces/vsd-7nm/asap_7nm_Xschem/bsimcmg.osdi
+
+run
+
+set xbrushwidth=3
+
+* Calculate drain voltage
+let vd = vdd - nfet_out
+
+* Calculate drain current through resistor
+let id = vd/1000
+
+plot id
+
+.endc
+
+.GLOBAL GND
+
+
+* FinFET Subcircuit
+.subckt asap_7nm_nfet D G S B l=7e-9 nfin=14
+nnmos_finfet D G S B BSIMCMG_osdi_N l=7e-9 nfin=14
+.ends asap_7nm_nfet
+
+
+* FinFET Model
+.model BSIMCMG_osdi_N BSIMCMG_va (
++ TYPE=1
++ version=107
++ bulkmod=1
++ igcmod=1
++ igbmod=0
++ gidlmod=1
++ geomod=1
++ rdsmod=0
++ capmod=0
++ tnom=25
++ eot=1e-9
++ eotbox=1.4e-7
++ tfin=6.5e-9
++ toxp=2.1e-9
++ nbody=1e22
++ phig=4.2466
++ epsrox=3.9
++ epsrsub=11.9
++ l=2.1e-8
++ xl=1e-9
++ hfin=3.2e-8
++ vsat=70000
++ u0=0.0303
++ rdsw=200
++ pclm=0.05
++ pdibl2=0.002
++ drout=1
++ cgso=1.6e-10
++ cgdo=1.6e-10
++ ute=-0.7
+)
+
+.end
